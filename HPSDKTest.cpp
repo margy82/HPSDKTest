@@ -18,7 +18,16 @@ int main()
     {
         cout << "Libreria non inizializzata!" << "\n";
     }
-    cout << hplfpsdk_isPrinterModelSupported("HP DesignJet T1700") << "\n";
+    size_t length = 0; 
+    char* charPointer = NULL; 
+    HPLFPSDK::Types::Result returnCode; //The following function will block this thread for 20 seconds. 
+    returnCode = hplfpsdk_getNetworkPrinters(&charPointer, length); 
+    if (returnCode == HPLFPSDK::Types::RESULT_OK)
+    { 
+        int len = sizeof(*charPointer) / sizeof(charPointer[0]);
+        for (int i = 0; i < len; i++) cout << charPointer[i] << "\n"; 
+        hplfpsdk_deleteBuffer(&charPointer); 
+    }
     hplfpsdk_terminate();
 }
 
