@@ -8,7 +8,9 @@ using namespace std;
 int main()
 {
     cout << "Hello World!\n";
-    hplfpsdk_setLogLevel(HPLFPSDK::Types::LOG_LEVEL_ALL);
+    const char* ipAddress = "192.168.5.180";
+    const char* printerName = "HP Latex 700 W";
+    hplfpsdk_setLogLevel(HPLFPSDK::Types::LOG_LEVEL_NONE);
     HPLFPSDK::Types::Result result = hplfpsdk_init();
     if (result == HPLFPSDK::Types::RESULT_OK)
     {
@@ -18,15 +20,17 @@ int main()
     {
         cout << "Libreria non inizializzata!" << "\n";
     }
-    size_t length = 0; 
-    char* charPointer = NULL; 
-    HPLFPSDK::Types::Result returnCode; //The following function will block this thread for 20 seconds. 
-    //returnCode = hplfpsdk_getNetworkPrinters(&charPointer, length);
-    returnCode = hplfpsdk_getSupportedPrinterModels(&charPointer, length);
-    if (returnCode == HPLFPSDK::Types::RESULT_OK)
-    { 
-        cout << *charPointer << "\n"; 
-        hplfpsdk_deleteBuffer(&charPointer); 
+    HPLFPSDK::IDevice* printer = NULL;
+    HPLFPSDK::Types::Result resultPrinter;
+    resultPrinter = hplfpsdk_getNewPrinter(ipAddress, printerName, printer);
+    if (resultPrinter == HPLFPSDK::Types::RESULT_OK)
+    {
+        cout << "Stampante inizializzata" << endl;
+        hplfpsdk_discardPrinter(printer);
+    }
+    else
+    {
+        cout << "Error: " << resultPrinter << endl;
     }
     hplfpsdk_terminate();
 }
