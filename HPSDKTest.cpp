@@ -2,10 +2,11 @@
 //
 
 #include <iostream>
+#include <string>
 #include "IHplfpsdk.h"
 using namespace std;
 
-int main()
+void main()
 {
     cout << "Hello World!\n";
     const char* ipAddress = "192.168.5.180";
@@ -26,12 +27,58 @@ int main()
     if (resultPrinter == HPLFPSDK::Types::RESULT_OK)
     {
         cout << "Stampante inizializzata" << endl;
-        hplfpsdk_discardPrinter(printer);
+        //hplfpsdk_discardPrinter(printer);
     }
     else
     {
         cout << "Error: " << resultPrinter << endl;
+        hplfpsdk_terminate();
+        return;
     }
+
+    HPLFPSDK::IInfoManager* infoManager = printer->getInfoManager();
+    char* info;
+    string res;
+    size_t logLength = 0;
+    result = infoManager->getPrinterStatus(&info, logLength);
+    res = (string)info;
+    while (res.find("Not initialized") != std::string::npos)
+    {
+        result = infoManager->getPrinterStatus(&info, logLength);
+        res = (string)info;
+        //cout << index << endl;
+    }
+    HPLFPSDK::Types::Result resultInfoManager = infoManager->getInkSystemStatus(&info, logLength);
+    if (resultInfoManager == HPLFPSDK::Types::RESULT_OK)
+    {
+        cout << info << endl;
+        hplfpsdk_deleteBuffer(&info);
+    }
+    else
+    {
+        cout << "Error: " << resultInfoManager << endl;
+    }
+    resultInfoManager = infoManager->getPrintheadSlotsStatus(&info, logLength);
+    if (resultInfoManager == HPLFPSDK::Types::RESULT_OK)
+    {
+        cout << info << endl;
+        hplfpsdk_deleteBuffer(&info);
+    }
+    else
+    {
+        cout << "Error: " << resultInfoManager << endl;
+    }
+    resultInfoManager = infoManager->getMaintenanceCartridgesStatus(&info, logLength);
+    if (resultInfoManager == HPLFPSDK::Types::RESULT_OK)
+    {
+        cout << info << endl;
+        hplfpsdk_deleteBuffer(&info);
+    }
+    else
+    {
+        cout << "Error: " << resultInfoManager << endl;
+    }
+    hplfpsdk_discardPrinter(printer);
     hplfpsdk_terminate();
 }
 
