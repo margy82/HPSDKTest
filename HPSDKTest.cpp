@@ -4,88 +4,210 @@
 #include <iostream>
 #include <string>
 #include "IHplfpsdk.h"
+
 using namespace std;
 
-void main()
+extern "C" __declspec(dllexport) unsigned char* GetCartridges(unsigned char* ip, unsigned char* pn)
 {
-    cout << "Hello World!\n";
-    const char* ipAddress = "192.168.5.180";
-    const char* printerName = "HP Latex 700 W";
-    hplfpsdk_setLogLevel(HPLFPSDK::Types::LOG_LEVEL_NONE);
-    HPLFPSDK::Types::Result result = hplfpsdk_init();
-    if (result == HPLFPSDK::Types::RESULT_OK)
+    try
     {
-        cout << "Libreria inizializzata correttamente!" << "\n";
-    }
-    else
-    {
-        cout << "Libreria non inizializzata!" << "\n";
-    }
-    HPLFPSDK::IDevice* printer = NULL;
-    HPLFPSDK::Types::Result resultPrinter;
-    resultPrinter = hplfpsdk_getNewPrinter(ipAddress, printerName, printer);
-    if (resultPrinter == HPLFPSDK::Types::RESULT_OK)
-    {
-        cout << "Stampante inizializzata" << endl;
-        //hplfpsdk_discardPrinter(printer);
-    }
-    else
-    {
-        cout << "Error: " << resultPrinter << endl;
-        hplfpsdk_terminate();
-        return;
-    }
+        //cout << "Hello World!\n";
+        char* ipAddress = (char*)ip;
+        char* printerName = (char*)pn;
+        hplfpsdk_setLogLevel(HPLFPSDK::Types::LOG_LEVEL_NONE);
+        HPLFPSDK::Types::Result result = hplfpsdk_init();
+        if (result == HPLFPSDK::Types::RESULT_OK)
+        {
+            cout << "Libreria inizializzata correttamente!" << "\n";
+        }
+        else
+        {
+            cout << "Libreria non inizializzata!" << "\n";
+            return (unsigned char*)"LIBRERIA NON INIZIALIZZATA";
+        }
+        HPLFPSDK::IDevice* printer = NULL;
+        HPLFPSDK::Types::Result resultPrinter;
+        resultPrinter = hplfpsdk_getNewPrinter(ipAddress, printerName, printer);
+        if (resultPrinter != HPLFPSDK::Types::RESULT_OK)
+        {
+            //cout << "Stampante inizializzata" << endl;
 
-    HPLFPSDK::IInfoManager* infoManager = printer->getInfoManager();
-    char* info;
-    string res;
-    size_t logLength = 0;
-    result = infoManager->getPrinterStatus(&info, logLength);
-    res = (string)info;
-    while (res.find("Not initialized") != std::string::npos)
-    {
-        result = infoManager->getPrinterStatus(&info, logLength);
-        res = (string)info;
-        //cout << index << endl;
+            //cout << "Error: " << resultPrinter << endl;
+            hplfpsdk_discardPrinter(printer);
+            hplfpsdk_terminate();
+            return (unsigned char*)"STAMPANTE NON DISPONIBILE";
+        }
+        //GETTING REMOTE MANAGER OBJECT
+        //HPLFPSDK::IAccountingManager* accountingManager = printer->getAccountingManager();
+        char* info = NULL;
+        rsize_t longLength = 0;
+        HPLFPSDK::IInfoManager* infoManager = printer->getInfoManager();
+        result = infoManager->getPrinterStatus(&info, longLength);
+        string s = (string)info;
+        while (s.find("Not initialized") != std::string::npos)
+        {
+            result = infoManager->getPrinterStatus(&info, longLength);
+            s = (string)info;
+            //cout << index << endl;
+        }
+        char* infoLog = NULL;
+        rsize_t longLengthLog = 0;
+        HPLFPSDK::Types::Result resultLog = HPLFPSDK::Types::RESULT_OK;
+        resultLog = infoManager->getInkSystemStatus(&infoLog, longLengthLog);
+        //resultLog = infoManager->getPrintheadSlotsStatus(&infoLog, longLengthLog);
+        //resultLog = infoManager->getMaintenanceCartridgesStatus(&infoLog, longLengthLog);
+        if (resultLog == HPLFPSDK::Types::RESULT_OK)
+        {
+            hplfpsdk_discardPrinter(printer);
+            hplfpsdk_terminate();
+            return (unsigned char*)infoLog;
+        }
+        else
+        {
+            hplfpsdk_discardPrinter(printer);
+            hplfpsdk_terminate();
+            return (unsigned char*)"STAMPANTE NON DISPONIBILE";
+        }
     }
-    HPLFPSDK::Types::Result resultInfoManager = infoManager->getInkSystemStatus(&info, logLength);
-    if (resultInfoManager == HPLFPSDK::Types::RESULT_OK)
+    catch (exception)
     {
-        res = info;
-        hplfpsdk_deleteBuffer(&info);
+        return (unsigned char*)"STAMPANTE NON DISPONIBILE";
     }
-    else
+}
+extern "C" __declspec(dllexport) unsigned char* GetPrintheads(unsigned char* ip, unsigned char* pn)
+{
+    try
     {
-        cout << "Error: " << resultInfoManager << endl;
-        return;
+        //cout << "Hello World!\n";
+        char* ipAddress = (char*)ip;
+        char* printerName = (char*)pn;
+        hplfpsdk_setLogLevel(HPLFPSDK::Types::LOG_LEVEL_NONE);
+        HPLFPSDK::Types::Result result = hplfpsdk_init();
+        if (result == HPLFPSDK::Types::RESULT_OK)
+        {
+            cout << "Libreria inizializzata correttamente!" << "\n";
+        }
+        else
+        {
+            cout << "Libreria non inizializzata!" << "\n";
+            return (unsigned char*)"LIBRERIA NON INIZIALIZZATA";
+        }
+        HPLFPSDK::IDevice* printer = NULL;
+        HPLFPSDK::Types::Result resultPrinter;
+        resultPrinter = hplfpsdk_getNewPrinter(ipAddress, printerName, printer);
+        if (resultPrinter != HPLFPSDK::Types::RESULT_OK)
+        {
+            //cout << "Stampante inizializzata" << endl;
+
+            //cout << "Error: " << resultPrinter << endl;
+            hplfpsdk_discardPrinter(printer);
+            hplfpsdk_terminate();
+            return (unsigned char*)"STAMPANTE NON DISPONIBILE";
+        }
+        //GETTING REMOTE MANAGER OBJECT
+        //HPLFPSDK::IAccountingManager* accountingManager = printer->getAccountingManager();
+        char* info = NULL;
+        rsize_t longLength = 0;
+        HPLFPSDK::IInfoManager* infoManager = printer->getInfoManager();
+        result = infoManager->getPrinterStatus(&info, longLength);
+        string s = (string)info;
+        while (s.find("Not initialized") != std::string::npos)
+        {
+            result = infoManager->getPrinterStatus(&info, longLength);
+            s = (string)info;
+            //cout << index << endl;
+        }
+        char* infoLog = NULL;
+        rsize_t longLengthLog = 0;
+        HPLFPSDK::Types::Result resultLog = HPLFPSDK::Types::RESULT_OK;
+        //resultLog = infoManager->getInkSystemStatus(&infoLog, longLengthLog);
+        resultLog = infoManager->getPrintheadSlotsStatus(&infoLog, longLengthLog);
+        //resultLog = infoManager->getMaintenanceCartridgesStatus(&infoLog, longLengthLog);
+        if (resultLog == HPLFPSDK::Types::RESULT_OK)
+        {
+            hplfpsdk_discardPrinter(printer);
+            hplfpsdk_terminate();
+            return (unsigned char*)infoLog;
+        }
+        else
+        {
+            hplfpsdk_discardPrinter(printer);
+            hplfpsdk_terminate();
+            return (unsigned char*)"STAMPANTE NON DISPONIBILE";
+        }
     }
-    resultInfoManager = infoManager->getPrintheadSlotsStatus(&info, logLength);
-    if (resultInfoManager == HPLFPSDK::Types::RESULT_OK)
+    catch (exception)
     {
-        res.append("FINE_LOG");
-        res.append((string)info);
-        hplfpsdk_deleteBuffer(&info);
+        return (unsigned char*)"STAMPANTE NON DISPONIBILE";
     }
-    else
+}
+
+extern "C" __declspec(dllexport) unsigned char* GetMaintanance(unsigned char* ip, unsigned char* pn)
+{
+    try
     {
-        cout << "Error: " << resultInfoManager << endl;
-        return;
+        //cout << "Hello World!\n";
+        char* ipAddress = (char*)ip;
+        char* printerName = (char*)pn;
+        hplfpsdk_setLogLevel(HPLFPSDK::Types::LOG_LEVEL_NONE);
+        HPLFPSDK::Types::Result result = hplfpsdk_init();
+        if (result == HPLFPSDK::Types::RESULT_OK)
+        {
+            cout << "Libreria inizializzata correttamente!" << "\n";
+        }
+        else
+        {
+            cout << "Libreria non inizializzata!" << "\n";
+            return (unsigned char*)"LIBRERIA NON INIZIALIZZATA";
+        }
+        HPLFPSDK::IDevice* printer = NULL;
+        HPLFPSDK::Types::Result resultPrinter;
+        resultPrinter = hplfpsdk_getNewPrinter(ipAddress, printerName, printer);
+        if (resultPrinter != HPLFPSDK::Types::RESULT_OK)
+        {
+            //cout << "Stampante inizializzata" << endl;
+
+            //cout << "Error: " << resultPrinter << endl;
+            hplfpsdk_discardPrinter(printer);
+            hplfpsdk_terminate();
+            return (unsigned char*)"STAMPANTE NON DISPONIBILE";
+        }
+        //GETTING REMOTE MANAGER OBJECT
+        //HPLFPSDK::IAccountingManager* accountingManager = printer->getAccountingManager();
+        char* info = NULL;
+        rsize_t longLength = 0;
+        HPLFPSDK::IInfoManager* infoManager = printer->getInfoManager();
+        result = infoManager->getPrinterStatus(&info, longLength);
+        string s = (string)info;
+        while (s.find("Not initialized") != std::string::npos)
+        {
+            result = infoManager->getPrinterStatus(&info, longLength);
+            s = (string)info;
+            //cout << index << endl;
+        }
+        char* infoLog = NULL;
+        rsize_t longLengthLog = 0;
+        HPLFPSDK::Types::Result resultLog = HPLFPSDK::Types::RESULT_OK;
+        //resultLog = infoManager->getInkSystemStatus(&infoLog, longLengthLog);
+        //resultLog = infoManager->getPrintheadSlotsStatus(&infoLog, longLengthLog);
+        resultLog = infoManager->getMaintenanceCartridgesStatus(&infoLog, longLengthLog);
+        if (resultLog == HPLFPSDK::Types::RESULT_OK)
+        {
+            hplfpsdk_discardPrinter(printer);
+            hplfpsdk_terminate();
+            return (unsigned char*)infoLog;
+        }
+        else
+        {
+            hplfpsdk_discardPrinter(printer);
+            hplfpsdk_terminate();
+            return (unsigned char*)"STAMPANTE NON DISPONIBILE";
+        }
     }
-    resultInfoManager = infoManager->getMaintenanceCartridgesStatus(&info, logLength);
-    if (resultInfoManager == HPLFPSDK::Types::RESULT_OK)
+    catch (exception)
     {
-        res.append("FINE_LOG");
-        res.append((string)info);
-        hplfpsdk_deleteBuffer(&info);
+        return (unsigned char*)"STAMPANTE NON DISPONIBILE";
     }
-    else
-    {
-        cout << "Error: " << resultInfoManager << endl;
-        return;
-    }
-    cout << res << endl;
-    hplfpsdk_discardPrinter(printer);
-    hplfpsdk_terminate();
 }
 
 // Per eseguire il programma: CTRL+F5 oppure Debug > Avvia senza eseguire debug
