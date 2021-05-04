@@ -51,33 +51,39 @@ void main()
     HPLFPSDK::Types::Result resultInfoManager = infoManager->getInkSystemStatus(&info, logLength);
     if (resultInfoManager == HPLFPSDK::Types::RESULT_OK)
     {
-        cout << info << endl;
+        res = info;
         hplfpsdk_deleteBuffer(&info);
     }
     else
     {
         cout << "Error: " << resultInfoManager << endl;
+        return;
     }
     resultInfoManager = infoManager->getPrintheadSlotsStatus(&info, logLength);
     if (resultInfoManager == HPLFPSDK::Types::RESULT_OK)
     {
-        cout << info << endl;
+        res.append("FINE_LOG");
+        res.append((string)info);
         hplfpsdk_deleteBuffer(&info);
     }
     else
     {
         cout << "Error: " << resultInfoManager << endl;
+        return;
     }
     resultInfoManager = infoManager->getMaintenanceCartridgesStatus(&info, logLength);
     if (resultInfoManager == HPLFPSDK::Types::RESULT_OK)
     {
-        cout << info << endl;
+        res.append("FINE_LOG");
+        res.append((string)info);
         hplfpsdk_deleteBuffer(&info);
     }
     else
     {
         cout << "Error: " << resultInfoManager << endl;
+        return;
     }
+    cout << res << endl;
     hplfpsdk_discardPrinter(printer);
     hplfpsdk_terminate();
 }
