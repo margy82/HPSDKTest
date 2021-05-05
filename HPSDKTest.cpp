@@ -39,9 +39,12 @@ extern "C" __declspec(dllexport) const char* GetSupplies(unsigned char* ip, unsi
         HPLFPSDK::Types::Result resultLog = HPLFPSDK::Types::RESULT_ERROR;
         while (resultLog != HPLFPSDK::Types::RESULT_OK)
         {
-            resultLog = infoManager->getInkSystemStatus(&printerLog, printerLogLenght);
-        }
+            resultLog = infoManager->getPrinterConfiguration(&printerLog, printerLogLenght);
+        };
         ret = (string)printerLog;
+        ret.append("FINE_LOG");
+        resultLog = infoManager->getInkSystemStatus(&printerLog, printerLogLenght);
+        ret.append((string)printerLog);
         ret.append("FINE_LOG");
         resultLog = infoManager->getPrintheadSlotsStatus(&printerLog, printerLogLenght);
         ret.append((string)printerLog);
