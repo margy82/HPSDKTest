@@ -30,9 +30,6 @@ extern "C" __declspec(dllexport) unsigned char* GetCartridges(unsigned char* ip,
         resultPrinter = hplfpsdk_getNewPrinter(ipAddress, printerName, printer);
         if (resultPrinter != HPLFPSDK::Types::RESULT_OK)
         {
-            //cout << "Stampante inizializzata" << endl;
-
-            //cout << "Error: " << resultPrinter << endl;
             hplfpsdk_discardPrinter(printer);
             hplfpsdk_terminate();
             return (unsigned char*)"STAMPANTE NON DISPONIBILE";
